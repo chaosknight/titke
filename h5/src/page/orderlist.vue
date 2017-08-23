@@ -1,25 +1,25 @@
 <template>
-  <div>
+  <layout active="order_list">
 
   <el-form :inline="true" :model="formInline" class="demo-form-inline">
     <el-form-item label="学校名称">
-      <el-select v-model="formInline.schoolname" placeholder="请选择学校名称" multiple allow-create>
+      <el-select v-model="formInline.schoolname" placeholder="请选择学校名称" allow-create clearable>
         <el-option
         v-for="item in schools"
         :key="item.value"
-        :label="item.label"
+        :label="item.value"
         :value="item.value">
       </el-option>
     </el-select>
     </el-form-item>
     <el-form-item label="开始时间">
       <el-form-item >
-        <el-date-picker type="date" placeholder="选择日期" v-model="formInline.startdate" style="width: 100%;"></el-date-picker>
+        <el-date-picker type="date" :editable="false" placeholder="选择日期" v-model="formInline.startdate" style="width: 100%;"></el-date-picker>
       </el-form-item>
     </el-form-item>
     <el-form-item label="结束时间">
       <el-form-item >
-        <el-date-picker type="date" placeholder="选择日期" v-model="formInline.enddate" style="width: 100%;"></el-date-picker>
+        <el-date-picker type="date" :editable="false" placeholder="选择日期" v-model="formInline.enddate" style="width: 100%;"></el-date-picker>
       </el-form-item>
     </el-form-item>
     <el-form-item>
@@ -54,14 +54,17 @@
       </template>
     </el-table-column>
   </el-table>
-</div>
+</layout>
 </template>
 <script>
+import layout from '../components/layout.vue'
   export default {
+    components: { layout },
     data() {
       return {
         loading:false,
         orderlist: [],
+        schools:[],
         formInline: {
           schoolname: '',
           startdate: '',
@@ -69,7 +72,18 @@
         }
       }
     },
+    mounted(){
+      this.getAllschool();
+    },
     methods: {
+      getAllschool(){
+        this.$http.get('/api/allschool').then((res)=>{
+          var data = res.data;
+          if(data) {
+            this.schools = data;
+          }
+        });
+      },
       onSubmit() {
         console.log('submit!');
       }

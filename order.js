@@ -13,7 +13,7 @@ module.exports = {,
     return {
       complaty:"公司名称",
       school:"学校名称",
-      time:"时间",
+      date:"时间",
       ctime:0，
       items:[
         {

@@ -1,20 +1,46 @@
 <template>
-  <div>
-
-
-
-
-    <div class="title">
-      {{order.complaty}}
-    </div>
+  <layout active="order_new">
     <el-row >
-  <el-button-group class="butns">
+      <el-button-group class="butns">
       <el-button type="primary" icon="plus" @click="addcol">添加商品</el-button>
       <el-button type="primary" icon="document">打印</el-button>
-      <el-button type="primary" icon="upload">保存</el-button>
+      <el-button type="primary" icon="upload" @click="save">保存</el-button>
       <el-button type="primary" icon="delete">删除</el-button>
     </el-button-group>
   </el-row>
+    <el-form ref="form" :model="order" label-width="0px">
+      <el-form-item label="" style="text-align:center;">
+        <el-autocomplete
+          v-model="order.complaty"
+          :fetch-suggestions="querySearchAsynccomplay"
+          placeholder="公司名称"
+        ></el-autocomplete>
+      </el-form-item>
+      <el-row class="mb_20">
+        <el-col :span="12">
+          <el-autocomplete
+            v-model="order.school"
+            :fetch-suggestions="querySearchAsyncschool"
+            placeholder="学校"
+          ></el-autocomplete>
+    </el-col>
+    <el-col :span="12">
+    <el-date-picker
+  v-model="order.date"
+  align="right"
+  type="date"
+  placeholder="选择日期" style="float:right;">
+</el-date-picker>
+</el-col>
+    </el-row>
+
+    </el-form>
+
+
+      <el-row >
+
+      </el-row>
+
     <el-table
     :data="order.items"
     :summary-method="getSummaries"
@@ -28,6 +54,7 @@
       <template scope="scope">
         <el-autocomplete
       class="inline-input"
+      :fetch-suggestions="querySearchAsyncproduct"
       v-model="scope.row.name"
       placeholder="商品名称"
     ></el-autocomplete>
@@ -40,6 +67,7 @@
         <el-autocomplete
       class="inline-input"
       v-model="scope.row.unit"
+      :fetch-suggestions="querySearchAsyncunit"
       placeholder="单位"
     ></el-autocomplete>
       </template>
@@ -94,10 +122,12 @@
      </template>
    </el-table-column>
   </el-table>
-
-  </div>
+  </layout>
 </template>
-<style scoped>
+<style>
+.mb_20{
+  margin-bottom: 20px;
+}
   .title{
     text-align: center;
     padding-bottom: 20px;
@@ -105,7 +135,6 @@
   }
   .butns{
     margin-bottom: 20px;
-    float: right;
   }
   .inline-input input{
     border: none;
@@ -113,12 +142,15 @@
   }
 </style>
 <script>
+import layout from '../components/layout.vue'
   export default {
+    components :{layout},
     data() {
       return {
         order:{
-          complaty:"公司名称",
-          school:"学校名称",
+          complaty:"",
+          school:"",
+          date:'',
           time:0,
           items:[
           ],
@@ -165,7 +197,42 @@
       handleDelete(index, rows) {
         //console.log(this.order)
         this.order.items.splice(index, 1);
-      }
+      },
+      querySearchAsynccomplay(queryString, cb){
+        this.$http.get('/api/allcompany').then((res)=>{
+          var data = res.data;
+          cb(queryString ?data.filter(this.createStateFilter(queryString)):data);
+        });
+      },
+      querySearchAsyncschool(queryString, cb){
+        this.$http.get('/api/allschool').then((res)=>{
+          var data = res.data;
+          cb(queryString ?data.filter(this.createStateFilter(queryString)):data);
+        });
+      },
+      querySearchAsyncproduct(queryString, cb){
+        this.$http.get('/api/allproduct').then((res)=>{
+          var data = res.data;
+          cb(queryString ?data.filter(this.createStateFilter(queryString)):data);
+        });
+      },
+      querySearchAsyncunit(queryString, cb){
+        this.$http.get('/api/allunit').then((res)=>{
+          var data = res.data;
+          cb(queryString ?data.filter(this.createStateFilter(queryString)):data);
+        });
+      },
+      createStateFilter(queryString) {
+       return (state) => {
+         return (state.value.indexOf(queryString.toLowerCase()) === 0);
+       };
+     },
+     save(){
+       this.$http.post('/api/saveorder',this.order).then((res)=>{
+         var data = res.data;
+         console.log(data)
+       });
+     }
     },
     mounted() {
 
