@@ -4,16 +4,17 @@ var order = levelup('order',{
 });
 var dbutils = require('./dbutils');
 module.exports = {,
+  index_prefix:"order_",
+  getKey:function(optin){
 
-  getDb:function(){
-    return order;
   },
   getbean: function(optin){
     var op = optin || {};
     return {
       complaty:"公司名称",
       school:"学校名称",
-      time:0,
+      time:"时间",
+      ctime:0，
       items:[
         {
           name:'大米',
@@ -27,6 +28,11 @@ module.exports = {,
       total:0
     }
   },
+
+  save:function(bean){
+
+  },
+
   findall:function(callback){
       dbutils.find(order,{},callback);
   }

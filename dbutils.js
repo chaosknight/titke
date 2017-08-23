@@ -1,4 +1,11 @@
+var levelup = require('levelup');
+var db = levelup('db',{
+    'valueEncoding':'json'
+});
 module.exports = {
+  getDb:function(){
+    return db;
+  },
   find:function (db,find,callback) {
     var option = {keys: true, values: true, revers: false, fillCache: true};
       if(find){
