@@ -13,14 +13,15 @@ module.exports = {,
     return {
       complaty:"公司名称",
       school:"学校名称",
-      time:"时间",
+      time:0,
       items:[
         {
-          name:'',
-          number:0,
-          price:0,
-
-          note:'',
+          name:'大米',
+          number:120,
+          price:54,
+          unit:'袋',
+          sum:'6480',
+          note:''
         }
       ],
       total:0

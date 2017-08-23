@@ -3,11 +3,11 @@
     <header></header>
     <el-row class="container">
       <el-col :span="4" class="menu">
-        <el-menu default-active="1-1"  style="height:100%;">
-          <el-submenu index="1">
-            <template slot="title"><i class="el-icon-message"></i>导航一</template>
-              <el-menu-item index="1-1">选项1</el-menu-item>
-              <el-menu-item index="1-2">选项2</el-menu-item>
+        <el-menu   style="height:100%;"  @open="handleOpen" @close="handleClose" :router="true">
+          <el-submenu index="orer">
+            <template slot="title"><i class="el-icon-message"></i>订单</template>
+              <el-menu-item index="order_new">新建</el-menu-item>
+              <el-menu-item index="order_list">查询</el-menu-item>
           </el-submenu>
           <el-menu-item index="2"><i class="el-icon-menu"></i>导航二</el-menu-item>
           <el-menu-item index="3"><i class="el-icon-setting"></i>设置</el-menu-item>
@@ -28,7 +28,12 @@ export default {
     }
   },
   methods: {
-
+    handleOpen(key, keyPath) {
+        console.log(key, keyPath);
+      },
+      handleClose(key, keyPath) {
+        console.log(key, keyPath);
+      }
   }
 }
 </script>
@@ -49,7 +54,6 @@ export default {
 }
 #app {
   font-family: Helvetica, sans-serif;
-  position: absolute;
   width: 100%;
   height: 100%;
 }
