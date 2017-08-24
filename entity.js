@@ -5,6 +5,8 @@ const schoolprefix = 'setting_school_';
 const unitprefix = 'setting_unit_';
 const orderprefix = 'order_';
 const orderindexprefix = 'index_';
+const orderindexschool = orderindexprefix + 'school_';
+const orderindexdate = orderindexprefix + 'date_';
 module.exports = {
   getschoolkey:function(name){
     return schoolprefix + name;
@@ -48,10 +50,10 @@ module.exports = {
     return orderprefix + ctime;
   },
   getindexkeyschool:function(school,date,ctime){
-    return orderindexprefix + school + '_' + date + '_' + ctime;
+    return orderindexschool + school + date + '_' + ctime;
   },
   getindexkeydate:function(school,date,ctime){
-    return orderindexprefix + date + '_' + school + '_' + ctime;
+    return orderindexdate + date + school + '_' + ctime;
   },
   saveorder(order,callback){
     if(order) {
@@ -70,10 +72,10 @@ module.exports = {
 
           if (!err&&value) {
             ops.push(
-              { type: 'del', key: this.getindexkeydate(order.school,order.date,order.ctime) }
+              { type: 'del', key: this.getindexkeydate(value.school,value.date,value.ctime) }
             );
             ops.push(
-              { type: 'del', key: this.getindexkeyschool(order.school,order.date,order.ctime)}
+              { type: 'del', key: this.getindexkeyschool(value.school,value.date,value.ctime)}
             );
           }
 
@@ -109,9 +111,69 @@ module.exports = {
       callback(null,{});
     }
 
+  },
+
+  getorder:function(id,callback){
+    var key = this.getorderkey(id)
+    dbutils.getDb().get(key,(err,value)=>{
+      callback(err,value);
+    })
+  },
+
+ findpageorder:function(param,callback){
+   var prefix_ = '';
+  if(param.schoolname) {
+    prefix_ = orderindexschool + param.schoolname
+  } else {
+    prefix_ = orderindexdate + param.schoolname
   }
 
+var find={
+  gt:prefix_ + param.startdate
+};
 
+if(param.enddate) {
+  find.lt = prefix_ + param.enddate
+} else {
+  find.lt = dbutils.getStringend(prefix_)
+}
+
+if(param.offset) {
+  find.offset = param.offset;
+}
+
+if(param.limit) {
+  find.limit = param.limit;
+}
+
+// async.series({
+// 	one: function(callback){
+// 		callback(null, 1);
+// 	},
+// 	two: function(callback){
+// 		callback(null, 2);
+// 	}
+// },function(err, results) {
+// 	console.log(results);
+// });
+
+   dbutils.findpage(dbutils.getDb(),find,(data_,total)=>{
+     var i_ = 0;
+     var result = [];
+     for(var i=0;i<data_.length;i++) {
+       dbutils.getDb().get(data_[i].value,function(err, value){
+         i_++;
+         if(!err) {
+           result.push(value)
+         }
+         if(i_ == data_.length) {
+           callback(result,total);
+         }
+       })
+     }
+
+   })
+ }
 
 
 

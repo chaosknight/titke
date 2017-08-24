@@ -9,6 +9,7 @@ import orderlist from './page/orderlist.vue'
 // RoutesPicBrowse
 const routes = [
     {path: '/', component: index},
+    {path:'/order_edit/:id',component:index},
     {path: '/order_list', component: orderlist},
     {path: '*', redirect: { path: '/' }}
 ];

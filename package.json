@@ -9,7 +9,8 @@
   "author": "chaos",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.15.4",
-    "body-parser": "1.17.2"
+    "async": "^2.5.0",
+    "body-parser": "1.17.2",
+    "express": "^4.15.4"
   }
 }

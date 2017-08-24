@@ -6,8 +6,8 @@
         <el-menu   style="height:100%;"  :router="true" :default-active="active">
           <el-submenu index="orer">
             <template slot="title"><i class="el-icon-message"></i>订单</template>
-              <el-menu-item index="order_new">新建</el-menu-item>
-              <el-menu-item index="order_list">查询</el-menu-item>
+              <el-menu-item index="/order_new">新建</el-menu-item>
+              <el-menu-item index="/order_list">查询</el-menu-item>
           </el-submenu>
           <el-menu-item index="2"><i class="el-icon-menu"></i>导航二</el-menu-item>
           <el-menu-item index="3"><i class="el-icon-setting"></i>设置</el-menu-item>

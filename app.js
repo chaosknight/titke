@@ -38,6 +38,21 @@ app.get('/api/allunit', function (req, res) {
   });
 });
 
+app.get('/api/getorder/:id',function(req,res){
+  var id = req.params.id;
+  entity.getorder(id,function(err,value){
+    if(err) {
+      res.send({
+      })
+    } else {
+      res.send({
+        value:value
+      })
+    }
+
+  })
+})
+
 app.post('/api/saveorder', function (req, res) {
   entity.saveorder(req.body,function(obj,err){
     if(err) {
@@ -55,23 +70,12 @@ app.post('/api/saveorder', function (req, res) {
 });
 
 app.post('/api/order_query',function(req, res){
-  var obj = req.body;
-
-  if(obj.schoolname) {
-
-  }
-
-
-  var find = {
-
-  }
-  if(obj.limit) {
-    find.limit = obj.limit;
-  }
-  if(obj.offset) {
-    find.offset = obj.offset;
-  }
-
+  entity.findpageorder(req.body,function(data,tital){
+    res.send({
+      list:data,
+      tital:tital
+    });
+  });
 
 });
 

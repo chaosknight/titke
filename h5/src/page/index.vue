@@ -1,11 +1,10 @@
 <template>
-  <layout active="order_new">
+  <layout active="/order_new">
     <el-row >
       <el-button-group class="butns">
       <el-button type="primary" icon="plus" @click="addcol">添加商品</el-button>
       <el-button type="primary" icon="document">打印</el-button>
       <el-button type="primary" icon="upload" @click="save">保存</el-button>
-      <el-button type="primary" icon="delete">删除</el-button>
     </el-button-group>
   </el-row>
     <el-form ref="form" :model="order" label-width="0px">
@@ -232,10 +231,18 @@ import layout from '../components/layout.vue'
          var data = res.data;
          console.log(data)
        });
+     },
+     initorder(){
+       if(this.$route.params.id) {
+          this.$http.get('/api/getorder/' + this.$route.params.id).then((res)=>{
+            if(res.data.value) {}
+            this.order = res.data.value;
+          });
+       }
      }
     },
     mounted() {
-
+      this.initorder();
     }
   }
 </script>

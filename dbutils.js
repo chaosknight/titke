@@ -2,6 +2,11 @@ var levelup = require('levelup');
 var db = levelup('db',{
     'valueEncoding':'json'
 });
+// var offsetStream = require('offset-stream');
+// var through      = require('ordered-through');
+// var fix          = require('level-fix-range');
+
+
 module.exports = {
   getDb:function(){
     return db;
@@ -34,6 +39,7 @@ module.exports = {
       });
   },
   findpage:function(db,find,callback){
+    console.log(find);
     var option = {keys: true, values: true, revers: false, fillCache: true};
       if(find){
         if (find.gt) {
@@ -59,5 +65,21 @@ module.exports = {
           callback(data_,total);
         }
       });
-  }
+  },
+//   paginate : function  (db, prefix, opts) {
+//   if (!opts) opts = {};
+//   if (!opts.page) opts.page = 0;
+//   if (!opts.num) opts.num = 10;
+//   var offset = opts.page * opts.num;
+//   var limit = offset + opts.num;
+//
+//   return db.createKeyStream(fix({
+//     reverse : true,
+//     start   : prefix + '!',
+//     end     : prefix + '~',
+//     limit   : limit
+//   }))
+//   .pipe(offsetStream(offset))
+//   .pipe(through(db.get.bind(db)))
+// }
 };

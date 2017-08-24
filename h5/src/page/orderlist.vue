@@ -1,5 +1,5 @@
 <template>
-  <layout active="order_list">
+  <layout active="/order_list">
 
   <el-form :inline="true" :model="formInline" class="demo-form-inline">
     <el-form-item label="学校名称">
@@ -36,12 +36,12 @@
       width="180">
     </el-table-column>
     <el-table-column
-      prop="name"
+      prop="school"
       label="学校名称"
       width="180">
     </el-table-column>
     <el-table-column
-      prop="address"
+      prop="total"
       label="总金额">
     </el-table-column>
     <el-table-column
@@ -49,7 +49,7 @@
       label="操作"
       width="100">
       <template scope="scope">
-        <el-button @click="handleClick" type="text" size="small">查看</el-button>
+        <el-button  type="text" size="small">查看</el-button>
         <el-button type="text" size="small">编辑</el-button>
       </template>
     </el-table-column>
@@ -64,6 +64,7 @@ import layout from '../components/layout.vue'
       return {
         loading:false,
         orderlist: [],
+        tital:0,
         schools:[],
         formInline: {
           schoolname: '',
@@ -85,7 +86,13 @@ import layout from '../components/layout.vue'
         });
       },
       onSubmit() {
-        console.log('submit!');
+        this.$http.post('/api/order_query',this.formInline).then((res)=>{
+          this.orderlist = res.data.list || [];
+          this.tital = res.data.tital || 0;
+        });
+      },
+      handleClick(){
+
       }
     }
   }
