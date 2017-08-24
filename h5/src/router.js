@@ -4,12 +4,14 @@ Vue.use(VueRouter)
 
 import index from './page/index.vue'
 import orderlist from './page/orderlist.vue'
+import view from './page/orderview.vue'
 
 
 // RoutesPicBrowse
 const routes = [
     {path: '/', component: index},
     {path:'/order_edit/:id',component:index},
+    {path:'/order_view/:id',component:view},
     {path: '/order_list', component: orderlist},
     {path: '*', redirect: { path: '/' }}
 ];

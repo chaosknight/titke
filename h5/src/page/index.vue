@@ -229,7 +229,6 @@ import layout from '../components/layout.vue'
      save(){
        this.$http.post('/api/saveorder',this.order).then((res)=>{
          var data = res.data;
-         console.log(data)
        });
      },
      initorder(){

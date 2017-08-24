@@ -49,8 +49,8 @@
       label="操作"
       width="100">
       <template scope="scope">
-        <el-button  type="text" size="small">查看</el-button>
-        <el-button type="text" size="small">编辑</el-button>
+        <el-button  type="text" size="small" @click="handleview(scope.$index)">查看</el-button>
+        <el-button type="text" size="small" @click="handleedit(scope.$index)">编辑</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -91,8 +91,11 @@ import layout from '../components/layout.vue'
           this.tital = res.data.tital || 0;
         });
       },
-      handleClick(){
-
+      handleedit(index){
+        this.$router.push("/order_edit/" + this.orderlist[index].ctime);
+      },
+      handleview(index){
+        this.$router.push("/order_view/" + this.orderlist[index].ctime);
       }
     }
   }

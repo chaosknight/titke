@@ -79,6 +79,9 @@ app.post('/api/order_query',function(req, res){
 
 });
 
+app.post('/api/upload',function(req, res){
+  res.send({});
+});
 
 
 app.use(express.static('public'));
