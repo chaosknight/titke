@@ -6,6 +6,24 @@
   padding-left: 0;
   padding-right: 0;
 }
+.print_c .el-table th{
+  background-color: #ffffff;
+}
+.print_c .el-table__footer-wrapper thead div, .print_c .el-table__header-wrapper thead div{
+  background-color: #ffffff;
+}
+.bord_top{
+  border-top:1px solid #dfe6ec;
+}
+.bord_left{
+  border-left:1px solid #dfe6ec;
+}
+.bord_right{
+  border-right:1px solid #dfe6ec;
+}
+.bord_bottom{
+  border-bottom:1px solid #dfe6ec;
+}
 @page {
   size: A4;
   margin: 0;
@@ -20,6 +38,12 @@
 </style>
 <template>
   <div style="width:200mm;margin:0 auto;" class="print_c page">
+  <el-row class="bord_top bord_left bord_right bord_bottom">
+    <el-col :span="24"><div style="height:20px;"></div></el-col>
+  </el-row>
+
+
+
     <el-table
     :data="order.items"
     border
@@ -29,7 +53,7 @@
       prop="name"
       label="商品名称"
       align="center"
-      width="50%">
+      width="60mm">
     </el-table-column>
     <el-table-column
       prop="unit"
@@ -73,7 +97,7 @@
     prop="name"
     label="商品名称"
     align="center"
-    width="50%">
+    width="60mm">
   </el-table-column>
   <el-table-column
     prop="unit"
