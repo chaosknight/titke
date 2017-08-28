@@ -16,20 +16,23 @@
         ></el-autocomplete>
       </el-form-item>
       <el-row class="mb_20">
-        <el-col :span="12">
+        <el-col :span="8">
           <el-autocomplete
             v-model="order.school"
             :fetch-suggestions="querySearchAsyncschool"
-            placeholder="学校"
+            placeholder="购货单位"
           ></el-autocomplete>
     </el-col>
-    <el-col :span="12">
+    <el-col :span="8">
     <el-date-picker
   v-model="order.date"
   align="right"
   type="date"
-  placeholder="选择日期" style="float:right;">
+  placeholder="选择日期">
 </el-date-picker>
+</el-col>
+<el-col :span="8">
+  <el-input v-model="order.note" placeholder="备注"></el-input>
 </el-col>
     </el-row>
 
@@ -41,12 +44,14 @@
       </el-row>
 
     <el-table
+    v-loading.fullscreen.lock="fullscreenLoading"
     :data="order.items"
     :summary-method="getSummaries"
     show-summary
     border
     style="width: 100%"
     >
+
     <el-table-column
       label="商品名称"
       width="150">
@@ -146,6 +151,7 @@ import layout from '../components/layout.vue'
     components :{layout},
     data() {
       return {
+        fullscreenLoading:false,
         order:{
           complaty:"",
           school:"",
@@ -227,8 +233,14 @@ import layout from '../components/layout.vue'
        };
      },
      save(){
+       this.fullscreenLoading = true;
        this.$http.post('/api/saveorder',this.order).then((res)=>{
          var data = res.data;
+         this.fullscreenLoading = false;
+         this.$message({
+          message: '保存成功',
+          type: 'success'
+        });
        });
      },
      initorder(){

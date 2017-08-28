@@ -40,7 +40,7 @@ export default {
   padding: 0;
 }
 .wrapper {
-    position: absolute;
+    /*//position: absolute;*/
 }
 .container, .wrapper {
     height: 100%;

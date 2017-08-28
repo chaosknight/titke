@@ -2,8 +2,8 @@
   <layout active="/order_list">
 
   <el-form :inline="true" :model="formInline" class="demo-form-inline">
-    <el-form-item label="学校名称">
-      <el-select v-model="formInline.schoolname" placeholder="请选择学校名称" allow-create clearable>
+    <el-form-item label="购货单位">
+      <el-select v-model="formInline.schoolname" placeholder="请选择购货单位" allow-create clearable>
         <el-option
         v-for="item in schools"
         :key="item.value"
@@ -30,26 +30,61 @@
     v-loading.body="loading"
     :data="orderlist"
     style="width: 100%">
+    <el-table-column type="expand">
+      <template scope="props">
+        <el-table
+        border
+        :summary-method="getSummaries"
+        show-summary
+        :data="props.row.items"
+        >
+        <el-table-column
+          prop="name"
+          label="商品名称">
+        </el-table-column>
+        <el-table-column
+          prop="unit"
+          label="单位">
+        </el-table-column>
+        <el-table-column
+          prop="price"
+          label="单价">
+        </el-table-column>
+        <el-table-column
+          prop="number"
+          label="数量">
+        </el-table-column>
+        <el-table-column
+          prop="number"
+          label="金额">
+          <template scope="scope">
+            {{scope.row.price * scope.row.number}}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="note"
+          label="备注">
+        </el-table-column>
+        </el-table>
+      </template>
+    </el-table-column>
     <el-table-column
       prop="date"
-      label="时间"
-      width="180">
+      label="时间">
     </el-table-column>
     <el-table-column
       prop="school"
-      label="学校名称"
-      width="180">
+      label="学校名称">
     </el-table-column>
     <el-table-column
       prop="total"
       label="总金额">
     </el-table-column>
     <el-table-column
-      fixed="right"
       label="操作"
       width="100">
       <template scope="scope">
-        <el-button  type="text" size="small" @click="handleview(scope.$index)">查看</el-button>
+        <el-button  type="text" size="small" @click="handleview(scope.$index)">打印</el-button>
         <el-button type="text" size="small" @click="handleedit(scope.$index)">编辑</el-button>
       </template>
     </el-table-column>
@@ -86,9 +121,11 @@ import layout from '../components/layout.vue'
         });
       },
       onSubmit() {
+        this.loading = true;
         this.$http.post('/api/order_query',this.formInline).then((res)=>{
           this.orderlist = res.data.list || [];
           this.tital = res.data.tital || 0;
+          this.loading = false;
         });
       },
       handleedit(index){
@@ -96,7 +133,34 @@ import layout from '../components/layout.vue'
       },
       handleview(index){
         this.$router.push("/order_view/" + this.orderlist[index].ctime);
-      }
+      },
+      getSummaries(param) {
+        const { columns, data } = param;
+        const sums = [];
+        columns.forEach((column, index) => {
+          if (index === 0) {
+            sums[index] = '合计';
+            return;
+          }
+          if(index < 4) {
+            sums[index] = 'N/A';
+            return;
+          }
+
+          if(index == 4) {
+            var titol = 0;
+            data.forEach((obj)=>{
+              console.log(obj);
+              titol = titol + obj.number * obj.price
+            });
+            sums[index] = '' + titol + ' 元';
+          } else {
+            sums[index] = '';
+          }
+        });
+
+        return sums;
+      },
     }
   }
 </script>
