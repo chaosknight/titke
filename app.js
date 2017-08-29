@@ -1,3 +1,5 @@
+(function () {
+    'use strict';
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
@@ -79,10 +81,6 @@ app.post('/api/order_query',function(req, res){
 
 });
 
-app.post('/api/upload',function(req, res){
-  res.send({});
-});
-
 
 app.use(express.static('public'));
 
@@ -91,3 +89,6 @@ var server = app.listen(3000, function () {
   var port = server.address().port;
   console.log('Example app listening at http://%s:%s', host, port);
 });
+module.exports = app;
+
+}());
