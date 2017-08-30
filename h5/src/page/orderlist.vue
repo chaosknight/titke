@@ -81,6 +81,10 @@
       label="总金额">
     </el-table-column>
     <el-table-column
+      prop="note"
+      label="备注">
+    </el-table-column>
+    <el-table-column
       label="操作"
       width="100">
       <template scope="scope">
@@ -129,10 +133,10 @@ import layout from '../components/layout.vue'
         });
       },
       handleedit(index){
-        this.$router.push("/order_edit/" + this.orderlist[index].ctime);
+        this.$router.push("/order_edit/" + this.orderlist[index]._id);
       },
       handleview(index){
-        this.$router.push("/order_view/" + this.orderlist[index].ctime);
+        this.$router.push("/order_view/" + this.orderlist[index]._id);
       },
       getSummaries(param) {
         const { columns, data } = param;

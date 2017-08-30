@@ -6,7 +6,16 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
-var entity = require('./entity');
+var Datastore = require('nedb')
+var db = {};
+db.order = new Datastore({ filename: 'order.db', autoload: true });
+db.school = new Datastore({ filename: 'school.db', autoload: true });
+db.company = new Datastore({ filename: 'company.db', autoload: true });
+db.product = new Datastore({ filename: 'product.db', autoload: true });
+db.unit = new Datastore({ filename: 'unit.db', autoload: true });
+
+
+
 app.all('*', function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Credentials", true);
@@ -17,78 +26,118 @@ app.all('*', function (req, res, next) {
     return next();
 });
 app.get('/api/allschool', function (req, res) {
-  entity.findallschool(function(list){
-    res.send(list);
+  db.school.find({}, function (err, docs) {
+    res.send(docs);
   });
 });
 
 app.get('/api/allcompany', function (req, res) {
-  entity.findallcompany(function(list){
-    res.send(list);
+  db.company.find({}, function (err, docs) {
+    res.send(docs);
   });
 });
 
 app.get('/api/allproduct', function (req, res) {
-  entity.findallproduct(function(list){
-    res.send(list);
+  db.product.find({}, function (err, docs) {
+    res.send(docs);
   });
 });
 
 app.get('/api/allunit', function (req, res) {
-  entity.findallunit(function(list){
-    res.send(list);
+  db.unit.find({}, function (err, docs) {
+    res.send(docs);
   });
 });
 
 app.get('/api/getorder/:id',function(req,res){
-  var id = req.params.id;
-  entity.getorder(id,function(err,value){
-    if(err) {
-      res.send({
-      })
-    } else {
-      res.send({
-        value:value
-      })
-    }
-
-  })
+  db.order.findOne({ _id: req.params.id }, function (err, doc) {
+    res.send({
+      value:doc
+    })
+  });
 })
 
+var orderafterinsert = function(newDoc){
+  if(newDoc) {
+    if(newDoc.complaty) {
+      db.company.insert({_id:newDoc.complaty,value:newDoc.complaty},function(){})
+    }
+    if(newDoc.school) {
+      db.school.insert({_id:newDoc.school,value:newDoc.school},function(){})
+    }
+    var products = [];
+    var units = [];
+    for(var i=0;i<newDoc.items.length;i++) {
+        products.push({_id: newDoc.items[i].name, value: newDoc.items[i].name });
+        units.push({_id: newDoc.items[i].unit, value: newDoc.items[i].unit });
+    }
+    db.product.insert(products,function(){})
+    db.unit.insert(units,function(){})
+  }
+
+};
+
+
+
 app.post('/api/saveorder', function (req, res) {
-  entity.saveorder(req.body,function(obj,err){
-    if(err) {
-      res.send({
-        success:0,
-        error:'保存失败'
-      });
-    } else {
+
+
+
+
+
+  if(req.body._id) {
+    db.order.update({ _id: req.body._id},req.body,{},function (err, numReplaced){
+      orderafterinsert(req.body)
       res.send({
         success:1,
-        data:obj
+        data:req.body
       });
-    }
-  });
+    })
+  } else {
+    db.order.insert(req.body, function (err, newDoc) {
+        orderafterinsert(newDoc)
+        res.send({
+          success:1,
+          data:newDoc
+        });
+    });
+  }
+
 });
 
 app.post('/api/order_query',function(req, res){
-  entity.findpageorder(req.body,function(data,tital){
+
+var query = {};
+if(req.body.schoolname) {
+  query.school = req.body.schoolname
+}
+
+if(req.body.startdate || req.body.enddate) {
+  var dataqu = {};
+  if(req.body.startdate) {
+    dataqu.$gt = req.body.startdate;
+  }
+
+  if(req.body.enddate) {
+    dataqu.$lt = req.body.enddate
+  }
+  query.date = dataqu;
+}
+var skip = req.body.skip||0;
+var limit = req.body.limit || 20;
+
+db.order.count(query, function (err, count) {
+  db.order.find(query).skip(skip).limit(limit).exec(function (err, docs) {
     res.send({
-      list:data,
-      tital:tital
+      list:docs,
+      tital:count
     });
   });
-
 });
-
+});
 
 app.use(express.static('public'));
-
-var server = app.listen(3000, function () {
-  var host = server.address().address;
-  var port = server.address().port;
-  console.log('Example app listening at http://%s:%s', host, port);
-});
+app.listen(3000, () => {});
 module.exports = app;
 
 }());

@@ -8,7 +8,12 @@
     </el-button-group>
   </el-row>
     <el-form ref="form" :model="order" label-width="0px">
-      <el-form-item label="" style="text-align:center;">
+      <el-form-item label="" style="text-align:center;"
+      prop="complaty"
+      :rules="[
+      { required: true, message: '公司名称不能为空'}
+      ]"
+      >
         <el-autocomplete
           v-model="order.complaty"
           :fetch-suggestions="querySearchAsynccomplay"
@@ -246,8 +251,9 @@ import layout from '../components/layout.vue'
      initorder(){
        if(this.$route.params.id) {
           this.$http.get('/api/getorder/' + this.$route.params.id).then((res)=>{
-            if(res.data.value) {}
-            this.order = res.data.value;
+            if(res.data.value) {
+              this.order = res.data.value;
+            }
           });
        }
      }
