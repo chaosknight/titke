@@ -8,11 +8,11 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 var Datastore = require('nedb')
 var db = {};
-db.order = new Datastore({ filename: 'order.db', autoload: true });
-db.school = new Datastore({ filename: 'school.db', autoload: true });
-db.company = new Datastore({ filename: 'company.db', autoload: true });
-db.product = new Datastore({ filename: 'product.db', autoload: true });
-db.unit = new Datastore({ filename: 'unit.db', autoload: true });
+db.order = new Datastore({ filename: 'db/order.db', autoload: true });
+db.school = new Datastore({ filename: 'db/school.db', autoload: true });
+db.company = new Datastore({ filename: 'db/company.db', autoload: true });
+db.product = new Datastore({ filename: 'db/product.db', autoload: true });
+db.unit = new Datastore({ filename: 'db/unit.db', autoload: true });
 
 
 
@@ -135,8 +135,16 @@ db.order.count(query, function (err, count) {
   });
 });
 });
-
-app.use(express.static('public'));
+// const electron = require('electron')
+// // Module to control application life.
+// const electronapp = electron.app
+app.use(express.static(process.resourcesPath + '/app/public',{
+  setHeaders:function(res,path,stat) {
+    if(res) {
+      res.setHeader("Content-type","text/html; charset=utf-8");
+    }
+  }
+}));
 app.listen(3000, () => {});
 module.exports = app;
 
