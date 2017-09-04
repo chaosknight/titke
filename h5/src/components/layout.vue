@@ -9,8 +9,6 @@
               <el-menu-item index="/order_new">新建</el-menu-item>
               <el-menu-item index="/order_list">查询</el-menu-item>
           </el-submenu>
-          <el-menu-item index="2"><i class="el-icon-menu"></i>导航二</el-menu-item>
-          <el-menu-item index="3"><i class="el-icon-setting"></i>设置</el-menu-item>
         </el-menu>
       </el-col>
       <el-col :span="20" class="content">

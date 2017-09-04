@@ -3,12 +3,12 @@
     <el-row >
       <el-button-group class="butns">
       <el-button type="primary" icon="plus" @click="addcol">添加商品</el-button>
-      <el-button type="primary" icon="document">打印</el-button>
+      <el-button type="primary" icon="document" @click="pringcick">打印</el-button>
       <el-button type="primary" icon="upload" @click="save">保存</el-button>
     </el-button-group>
   </el-row>
     <el-form ref="form" :model="order" label-width="0px">
-      <el-form-item label="" style="text-align:center;"
+      <el-form-item label="" style="width:200px; margin:22px auto;"
       prop="complaty"
       :rules="[
       { required: true, message: '公司名称不能为空'}
@@ -22,19 +22,34 @@
       </el-form-item>
       <el-row class="mb_20">
         <el-col :span="8">
+          <el-form-item
+          prop="school"
+          :rules="[
+          { required: true, message: '购货单位不能为空'}
+          ]"
+          >
+
           <el-autocomplete
             v-model="order.school"
             :fetch-suggestions="querySearchAsyncschool"
             placeholder="购货单位"
           ></el-autocomplete>
+          </el-form-item>
     </el-col>
     <el-col :span="8">
+      <el-form-item
+      prop="date"
+      :rules="[
+      { required: true, message: '日期不能为空'}
+      ]"
+      >
     <el-date-picker
   v-model="order.date"
   align="right"
   type="date"
   placeholder="选择日期">
 </el-date-picker>
+</el-form-item>
 </el-col>
 <el-col :span="8">
   <el-input v-model="order.note" placeholder="备注"></el-input>
@@ -51,6 +66,7 @@
     <el-table
     v-loading.fullscreen.lock="fullscreenLoading"
     :data="order.items"
+    highlight-current-row
     :summary-method="getSummaries"
     show-summary
     border
@@ -161,7 +177,6 @@ import layout from '../components/layout.vue'
           complaty:"",
           school:"",
           date:'',
-          time:0,
           items:[
           ],
           total:0
@@ -238,14 +253,30 @@ import layout from '../components/layout.vue'
        };
      },
      save(){
-       this.fullscreenLoading = true;
-       this.$http.post('/api/saveorder',this.order).then((res)=>{
-         var data = res.data;
-         this.fullscreenLoading = false;
-         this.$message({
-          message: '保存成功',
-          type: 'success'
-        });
+       this.$refs['form'].validate((valid) => {
+         if (valid) {
+           var newitems = [];
+           var items = this.order.items
+           if(items.length > 0 ) {
+             for(var i=0;i<items.length;i++) {
+               if(items[i].name && items[i].number && items[i].price && items[i].unit) {
+                 newitems.push(items[i])
+               }
+             }
+           }
+           this.order.items = newitems;
+           this.fullscreenLoading = true;
+            this.$http.post('/api/saveorder',this.order).then((res)=>{
+              var data = res.data;
+              this.fullscreenLoading = false;
+              this.$message({
+               message: '保存成功',
+               type: 'success'
+             });
+            });
+         } else {
+           return false;
+         }
        });
      },
      initorder(){
@@ -256,6 +287,16 @@ import layout from '../components/layout.vue'
             }
           });
        }
+     },
+     pringcick(){
+       this.$refs['form'].validate((valid) => {
+         if (valid) {
+           alert('submit!');
+         } else {
+           console.log('error submit!!');
+           return false;
+         }
+       });
      }
     },
     mounted() {

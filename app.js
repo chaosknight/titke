@@ -65,26 +65,19 @@ var orderafterinsert = function(newDoc){
     if(newDoc.school) {
       db.school.insert({_id:newDoc.school,value:newDoc.school},function(){})
     }
-    var products = [];
-    var units = [];
     for(var i=0;i<newDoc.items.length;i++) {
-        products.push({_id: newDoc.items[i].name, value: newDoc.items[i].name });
-        units.push({_id: newDoc.items[i].unit, value: newDoc.items[i].unit });
+      if(newDoc.items[i].name) {
+        db.product.insert({_id: newDoc.items[i].name, value: newDoc.items[i].name },function(){})
+      }
+      if(newDoc.items[i].unit) {
+        db.unit.insert({_id: newDoc.items[i].unit, value: newDoc.items[i].unit },function(){})
+      }
     }
-    db.product.insert(products,function(){})
-    db.unit.insert(units,function(){})
+
+
   }
-
 };
-
-
-
 app.post('/api/saveorder', function (req, res) {
-
-
-
-
-
   if(req.body._id) {
     db.order.update({ _id: req.body._id},req.body,{},function (err, numReplaced){
       orderafterinsert(req.body)
@@ -115,11 +108,11 @@ if(req.body.schoolname) {
 if(req.body.startdate || req.body.enddate) {
   var dataqu = {};
   if(req.body.startdate) {
-    dataqu.$gt = req.body.startdate;
+    dataqu.$gte = req.body.startdate;
   }
 
   if(req.body.enddate) {
-    dataqu.$lt = req.body.enddate
+    dataqu.$lte = req.body.enddate
   }
   query.date = dataqu;
 }

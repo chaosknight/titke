@@ -56,13 +56,13 @@
 </style>
 <template>
   <div style="width:240mm;margin:0 auto;color: #1f2d3d;" class="print_c page">
-    <div v-for="item in tables" class="bord_left bord_right bord_bottom" style="height:140mm;padding:10mm 20mm;">
+    <div v-for="item in tables" class="" style="height:140mm;padding:10mm 20mm;">
       <el-row >
         <el-col :span="24"><div style="text-align:center;line-height:6mm;font-size:4mm;">{{order.complaty}}</div></el-col>
       </el-row>
       <el-row  class="col_height align_left" style="margin:4mm auto;">
         <el-col :span="8">购货单位：{{order.school}}</el-col>
-        <el-col :span="8">日期：{{order.date}}</el-col>
+        <el-col :span="8">日期：{{order.date|formatDate}}</el-col>
         <el-col :span="8">备注：{{order.note}}</el-col>
 
       </el-row>
@@ -333,15 +333,18 @@
         <el-col :span="8">复核：</el-col>
       </el-row>
     </div>
-
-
-
-
-
   </div>
 </template>
 <script>
+
+import {formatDate} from '../date.js';
 export default {
+  filters: {
+      formatDate(time) {
+          var date = new Date(time);
+          return formatDate(date, 'yyyy-MM-dd');
+      }
+  },
   data() {
     return {
       span:[
@@ -438,6 +441,9 @@ export default {
        var items = this.order.items;
        for(;items.length>0;) {
          list.push(items.splice(0,20))
+       }
+       if(list.length == 0) {
+         list.push([])
        }
        return list;
 
