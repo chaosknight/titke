@@ -71,6 +71,9 @@
     <el-table-column
       prop="date"
       label="时间">
+      <template scope="scope">
+        {{scope.row.date|formatDate}}
+      </template>
     </el-table-column>
     <el-table-column
       prop="school"
@@ -93,22 +96,43 @@
       </template>
     </el-table-column>
   </el-table>
+  <el-row style="margin-top:20px;">
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-sizes="[20, 50, 100]"
+      :page-size="formInline.limit"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="tital">
+    </el-pagination>
+  </el-row >
 </layout>
 </template>
 <script>
 import layout from '../components/layout.vue'
+import {formatDate} from '../date.js';
   export default {
+    filters: {
+        formatDate(time) {
+            var date = new Date(time);
+            return formatDate(date, 'yyyy-MM-dd');
+        }
+    },
     components: { layout },
     data() {
       return {
         loading:false,
         orderlist: [],
         tital:0,
+        currentPage:1,
         schools:[],
         formInline: {
           schoolname: '',
           startdate: '',
-          enddate:''
+          enddate:'',
+          skip:0,
+          limit:20
         }
       }
     },
@@ -116,6 +140,13 @@ import layout from '../components/layout.vue'
       this.getAllschool();
     },
     methods: {
+      handleCurrentChange(val){
+        this.formInline.skip = (val - 1) * this.formInline.limit
+        this.onSubmit();
+      },
+      handleSizeChange(val){
+        this.formInline.limit = val;
+      },
       getAllschool(){
         this.$http.get('/api/allschool').then((res)=>{
           var data = res.data;
@@ -136,7 +167,19 @@ import layout from '../components/layout.vue'
         this.$router.push("/order_edit/" + this.orderlist[index]._id);
       },
       handleview(index){
-        this.$router.push("/order_view/" + this.orderlist[index]._id);
+        var frameId = "print_fid"
+        var usedFrame = document.getElementById(frameId)
+        if (usedFrame) {
+          usedFrame.parentNode.removeChild(usedFrame)
+        }
+
+        var printFrame = document.createElement('iframe')
+        printFrame.setAttribute('style', 'visibility: hidden;')
+        printFrame.id = frameId;
+        document.body.appendChild(printFrame);
+        printFrame.src = "/#/order_view/" + this.orderlist[index]._id;
+
+        //this.$router.push("/order_view/" + this.orderlist[index]._id);
       },
       getSummaries(param) {
         const { columns, data } = param;
@@ -154,7 +197,6 @@ import layout from '../components/layout.vue'
           if(index == 4) {
             var titol = 0;
             data.forEach((obj)=>{
-              console.log(obj);
               titol = titol + obj.number * obj.price
             });
             sums[index] = '' + titol + ' 元';

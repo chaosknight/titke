@@ -8,11 +8,11 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 var Datastore = require('nedb')
 var db = {};
-db.order = new Datastore({ filename: 'order.db', autoload: true });
-db.school = new Datastore({ filename: 'school.db', autoload: true });
-db.company = new Datastore({ filename: 'company.db', autoload: true });
-db.product = new Datastore({ filename: 'product.db', autoload: true });
-db.unit = new Datastore({ filename: 'unit.db', autoload: true });
+db.order = new Datastore({ filename: 'db/order.db', autoload: true });
+db.school = new Datastore({ filename: 'db/school.db', autoload: true });
+db.company = new Datastore({ filename: 'db/company.db', autoload: true });
+db.product = new Datastore({ filename: 'db/product.db', autoload: true });
+db.unit = new Datastore({ filename: 'db/unit.db', autoload: true });
 
 
 
@@ -65,26 +65,19 @@ var orderafterinsert = function(newDoc){
     if(newDoc.school) {
       db.school.insert({_id:newDoc.school,value:newDoc.school},function(){})
     }
-    var products = [];
-    var units = [];
     for(var i=0;i<newDoc.items.length;i++) {
-        products.push({_id: newDoc.items[i].name, value: newDoc.items[i].name });
-        units.push({_id: newDoc.items[i].unit, value: newDoc.items[i].unit });
+      if(newDoc.items[i].name) {
+        db.product.insert({_id: newDoc.items[i].name, value: newDoc.items[i].name },function(){})
+      }
+      if(newDoc.items[i].unit) {
+        db.unit.insert({_id: newDoc.items[i].unit, value: newDoc.items[i].unit },function(){})
+      }
     }
-    db.product.insert(products,function(){})
-    db.unit.insert(units,function(){})
+
+
   }
-
 };
-
-
-
 app.post('/api/saveorder', function (req, res) {
-
-
-
-
-
   if(req.body._id) {
     db.order.update({ _id: req.body._id},req.body,{},function (err, numReplaced){
       orderafterinsert(req.body)
@@ -115,11 +108,11 @@ if(req.body.schoolname) {
 if(req.body.startdate || req.body.enddate) {
   var dataqu = {};
   if(req.body.startdate) {
-    dataqu.$gt = req.body.startdate;
+    dataqu.$gte = req.body.startdate;
   }
 
   if(req.body.enddate) {
-    dataqu.$lt = req.body.enddate
+    dataqu.$lte = req.body.enddate
   }
   query.date = dataqu;
 }

@@ -2,9 +2,10 @@
   "name": "titke",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "build": "electron-packager . --platform=win32 --arch=all  --out ./package",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "chaos",
@@ -14,9 +15,9 @@
     "body-parser": "1.17.2",
     "electron": "~1.6.2",
     "express": "^4.15.4",
-    "leveldown": "^1.7.2",
-    "levelup": "^1.3.9",
-    "lowdb": "^0.17.2",
     "nedb": "^1.8.0"
+  },
+  "devDependencies": {
+    "electron-packager": "^9.0.0"
   }
 }
