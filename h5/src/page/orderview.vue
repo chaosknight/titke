@@ -1,6 +1,6 @@
 <style>
 .print_c .el-table{
-  font-size: 0.02mm;
+  font-size: 4mm;
 }
 .print_c .el-table .cell, .el-table th>div{
   padding-left: 0;
@@ -27,7 +27,7 @@
 
 .col_height{
   height: 8mm;
-  font-size: 0.02mm;
+  font-size: 4mm;
   line-height: 8mm;
   text-align: center;
 }
@@ -35,7 +35,7 @@
   text-align: left;
 }
 .table_header{
-  font-size: 0.05mm;
+  font-size: 4mm;
 }
 
 @page {
