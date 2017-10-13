@@ -238,11 +238,24 @@ import { mapGetters } from 'vuex';
 
         return sums;
       },
+      handleview(){
+        var frameId = "print_fid"
+        var usedFrame = document.getElementById(frameId)
+        if (usedFrame) {
+          usedFrame.parentNode.removeChild(usedFrame)
+        }
+
+        var printFrame = document.createElement('iframe')
+        printFrame.setAttribute('style', 'visibility: hidden;')
+        printFrame.id = frameId;
+        document.body.appendChild(printFrame);
+        printFrame.src = "/#/order_view/" + this.order._id;
+      },
       addcol(){
         this.order.items.push({
             name:'',
-            number:0,
-            price:0,
+            number:'',
+            price:'',
             unit:this.dunit,
             note:''
         });
@@ -309,7 +322,7 @@ import { mapGetters } from 'vuex';
               }
               this.fullscreenLoading = false;
               if(print) {
-
+                this.handleview();
               }
               this.$message({
                message: '保存成功',

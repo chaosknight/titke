@@ -1,22 +1,27 @@
 <template>
   <layout active="/setting_default">
-    <el-form :inline="false" :model="formInline" label-width="80px" class="demo-form-inline">
+    <el-form ref="settingform" :inline="false" :model="formInline" label-width="80px" class="demo-form-inline">
       <el-form-item
         label="默认公司"
-        prop="complaty"
+        prop="d_complatyname"
         :rules="[
         { required: true, message: '公司名称不能为空'}
         ]"
         >
           <el-autocomplete
-            v-model="formInline.complaty"
+            v-model="formInline.d_complatyname"
             :fetch-suggestions="querySearchAsynccomplay"
             placeholder="公司名称"
           ></el-autocomplete>
       </el-form-item>
-      <el-form-item label="默认单位">
+      <el-form-item label="默认单位"
+      prop="d_unit"
+      :rules="[
+      { required: true, message: '默认单位不能为空'}
+      ]"
+      >
         <el-autocomplete
-          v-model="formInline.unit"
+          v-model="formInline.d_unit"
           :fetch-suggestions="querySearchAsyncunit"
           placeholder="默认单位"
         ></el-autocomplete>
@@ -38,8 +43,8 @@ import { Loading } from 'element-ui';
       return {
         loading:false,
         formInline: {
-          complaty:'',
-          unit: '',
+          d_complatyname:'',
+          d_unit: '',
         }
       }
     },
@@ -62,15 +67,27 @@ import { Loading } from 'element-ui';
     },
     methods: {
       initcname(){
-          this.formInline.complaty = this.complayname
+          this.formInline.d_complatyname = this.complayname
       },
       initdunit() {
-        this.formInline.unit = this.dunit
+        this.formInline.d_unit = this.dunit
       },
       onSubmit() {
-        var loadingInstance1 = Loading.service({ fullscreen: true });
-        this.$http.post('/api/order_query',this.formInline).then((res)=>{
+        this.$refs['settingform'].validate((valid) => {
+          if (valid) {
+            var loadingInstance1 = Loading.service({ fullscreen: true });
+            this.$http.post('/api/savesetting',this.formInline).then((res)=>{
+              loadingInstance1.close()
+              this.$message({
+                type: 'success',
+                message: '保存成功!'
+              });
+            });
+          } else {
+            return false;
+          }
         });
+
       },
       querySearchAsyncunit(queryString, cb){
         var data = this.allunits;

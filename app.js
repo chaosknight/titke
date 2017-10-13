@@ -80,6 +80,20 @@ app.get('/api/settingconfig',function(req,res) {
 });
 
 
+app.post('/api/savesetting',function(req,res) {
+  var doc = req.body;
+
+  db.setting.update({_id:'setting_id'},doc,{},function(){
+    doc._id = 'setting_id'
+    db.setting.insert(doc,function(err, newDoc) {
+      res.send({
+        value:newDoc
+      })
+    })
+  })
+});
+
+
 app.get('/api/getorder/:id',function(req,res){
   db.order.findOne({ _id: req.params.id }, function (err, doc) {
     res.send({
