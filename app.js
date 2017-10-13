@@ -13,8 +13,8 @@ db.school = new Datastore({ filename: 'db/school.db', autoload: true });
 db.company = new Datastore({ filename: 'db/company.db', autoload: true });
 db.product = new Datastore({ filename: 'db/product.db', autoload: true });
 db.unit = new Datastore({ filename: 'db/unit.db', autoload: true });
-
-
+db.note = new Datastore({ filename: 'db/note.db', autoload: true });
+db.setting = new Datastore({ filename: 'db/setting.db', autoload: true });
 
 app.all('*', function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -25,29 +25,60 @@ app.all('*', function (req, res, next) {
     res.header("Content-Type", "application/json;charset=utf-8");
     return next();
 });
-app.get('/api/allschool', function (req, res) {
+
+
+app.get('/api/settingconfig',function(req,res) {
+  var count = 0;
+  var result = {};
   db.school.find({}, function (err, docs) {
-    res.send(docs);
+    count++;
+    result.all_schools = docs;
+    if(count == 6) {
+      res.send(result);
+    }
   });
-});
-
-app.get('/api/allcompany', function (req, res) {
   db.company.find({}, function (err, docs) {
-    res.send(docs);
+    count++;
+    result.all_companys = docs;
+    if(count == 6) {
+      res.send(result);
+    }
   });
-});
 
-app.get('/api/allproduct', function (req, res) {
   db.product.find({}, function (err, docs) {
-    res.send(docs);
+    count++;
+    result.all_p_names = docs;
+    if(count == 6) {
+      res.send(result);
+    }
   });
+
+  db.unit.find({}, function (err, docs) {
+    count++;
+    result.all_units = docs;
+    if(count == 6) {
+      res.send(result);
+    }
+  });
+
+  db.note.find({}, function (err, docs) {
+    count++;
+    result.all_notes = docs;
+    if(count == 6) {
+      res.send(result);
+    }
+  });
+
+  db.setting.findOne({_id:'setting_id'},function(err,docs){
+    count++;
+    result.settings = docs;
+    if(count == 6) {
+      res.send(result);
+    }
+  });
+
 });
 
-app.get('/api/allunit', function (req, res) {
-  db.unit.find({}, function (err, docs) {
-    res.send(docs);
-  });
-});
 
 app.get('/api/getorder/:id',function(req,res){
   db.order.findOne({ _id: req.params.id }, function (err, doc) {
@@ -65,6 +96,11 @@ var orderafterinsert = function(newDoc){
     if(newDoc.school) {
       db.school.insert({_id:newDoc.school,value:newDoc.school},function(){})
     }
+    if(newDoc.note) {
+      db.note.insert({_id:newDoc.note,value:newDoc.note},function(){})
+    }
+
+
     for(var i=0;i<newDoc.items.length;i++) {
       if(newDoc.items[i].name) {
         db.product.insert({_id: newDoc.items[i].name, value: newDoc.items[i].name },function(){})
@@ -98,11 +134,25 @@ app.post('/api/saveorder', function (req, res) {
 
 });
 
+app.get('/api/order_del/:id',function(req,res){
+  db.order.remove({ _id: req.params.id }, {}, function (err, numRemoved) {
+    res.send({
+      numRemoved:numRemoved
+      }
+    )
+  });
+})
+
+
 app.post('/api/order_query',function(req, res){
 
 var query = {};
 if(req.body.schoolname) {
   query.school = req.body.schoolname
+}
+
+if(req.body.note) {
+  query.note = req.body.note;
 }
 
 if(req.body.startdate || req.body.enddate) {
@@ -114,19 +164,18 @@ if(req.body.startdate || req.body.enddate) {
   if(req.body.enddate) {
     dataqu.$lte = req.body.enddate
   }
+
+
+
+
   query.date = dataqu;
 }
-var skip = req.body.skip||0;
-var limit = req.body.limit || 20;
 
-db.order.count(query, function (err, count) {
-  db.order.find(query).skip(skip).limit(limit).exec(function (err, docs) {
+  db.order.find(query).sort({date:-1}).exec(function (err, docs) {
     res.send({
-      list:docs,
-      tital:count
+      list:docs
     });
   });
-});
 });
 // const electron = require('electron')
 // // Module to control application life.

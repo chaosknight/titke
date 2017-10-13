@@ -52,7 +52,15 @@
 </el-form-item>
 </el-col>
 <el-col :span="8">
-  <el-input v-model="order.note" placeholder="备注"></el-input>
+  <el-form-item
+  prop="note"
+  >
+  <el-autocomplete
+    v-model="order.note"
+    :fetch-suggestions="querySearchAsyncnote"
+    placeholder="备注"
+  ></el-autocomplete>
+  </el-form-item>
 </el-col>
     </el-row>
 
@@ -98,17 +106,6 @@
       </template>
     </el-table-column>
     <el-table-column
-      label="单价"
-      width="120">
-      <template scope="scope">
-        <el-input
-        class="inline-input"
-        placeholder="单价"
-        v-model="scope.row.price">
-      </el-input>
-      </template>
-    </el-table-column>
-    <el-table-column
       label="数量"
       width="120">
       <template scope="scope">
@@ -120,10 +117,22 @@
       </template>
     </el-table-column>
     <el-table-column
+      label="单价"
+      width="120">
+      <template scope="scope">
+        <el-input
+        class="inline-input"
+        placeholder="单价"
+        v-model="scope.row.price">
+      </el-input>
+      </template>
+    </el-table-column>
+
+    <el-table-column
       label="金额"
       width="150">
       <template scope="scope">
-        {{scope.row.number*scope.row.price}}
+        {{ accMul(scope.row.number,scope.row.price)}}
       </template>
     </el-table-column>
     <el-table-column
@@ -149,7 +158,7 @@
   </el-table>
   </layout>
 </template>
-<style>
+<style scoped>
 .mb_20{
   margin-bottom: 20px;
 }
@@ -168,22 +177,44 @@
 </style>
 <script>
 import layout from '../components/layout.vue'
+import { mapGetters } from 'vuex';
   export default {
     components :{layout},
     data() {
       return {
         fullscreenLoading:false,
         order:{
-          complaty:"",
+          complaty:'',
           school:"",
           date:'',
+          note:'',
           items:[
           ],
           total:0
         }
       };
     },
+    watch:{
+      complayname:"initcname"
+    },
+    computed: {
+      ...mapGetters({
+          complayname: 'getdcomplayname',
+          dunit: 'getdunit',
+          allschools:'getAllschools',
+          allpnames:'getAllpnames',
+          allcompanys:'getAllcompanys',
+          allunits:'getAllunits',
+          allnotes:'getAllnotes'
+      })
+    },
     methods: {
+      initcname(){
+        if(this.$route.params.id) {
+        } else {
+          this.order.complaty = this.complayname
+        }
+      },
       getSummaries(param) {
         const { columns, data } = param;
         const sums = [];
@@ -196,12 +227,9 @@ import layout from '../components/layout.vue'
             sums[index] = '';
             return;
           }
-
-
           var titol = 0;
           data.forEach((obj)=>{
-            console.log(obj);
-            titol = titol + obj.number * obj.price
+            titol = this.accAdd(titol , this.accMul(obj.number , obj.price))
           });
           this.order.total = titol;
           sums[index] = '' + titol + ' 元';
@@ -215,44 +243,53 @@ import layout from '../components/layout.vue'
             name:'',
             number:0,
             price:0,
-            unit:'',
+            unit:this.dunit,
             note:''
         });
+      },
+      accMul (arg1,arg2){
+        var m=0,s1=arg1.toString(),s2=arg2.toString();
+        try{m+=s1.split(".")[1].length}catch(e){}
+        try{m+=s2.split(".")[1].length}catch(e){}
+        return Number(s1.replace(".",""))*Number(s2.replace(".",""))/Math.pow(10,m)
+      },
+      accAdd(arg1,arg2){
+          var r1,r2,m;
+          try{r1=arg1.toString().split(".")[1].length}catch(e){r1=0}
+          try{r2=arg2.toString().split(".")[1].length}catch(e){r2=0}
+          m=Math.pow(10,Math.max(r1,r2))
+          return (arg1*m+arg2*m)/m
       },
       handleDelete(index, rows) {
         //console.log(this.order)
         this.order.items.splice(index, 1);
       },
       querySearchAsynccomplay(queryString, cb){
-        this.$http.get('/api/allcompany').then((res)=>{
-          var data = res.data;
-          cb(queryString ?data.filter(this.createStateFilter(queryString)):data);
-        });
+        var data = this.allcompanys;
+        cb(queryString ?data.filter(this.createStateFilter(queryString)):data);
       },
       querySearchAsyncschool(queryString, cb){
-        this.$http.get('/api/allschool').then((res)=>{
-          var data = res.data;
-          cb(queryString ?data.filter(this.createStateFilter(queryString)):data);
-        });
+        var data = this.allschools;
+        cb(queryString ?data.filter(this.createStateFilter(queryString)):data);
       },
       querySearchAsyncproduct(queryString, cb){
-        this.$http.get('/api/allproduct').then((res)=>{
-          var data = res.data;
-          cb(queryString ?data.filter(this.createStateFilter(queryString)):data);
-        });
+        var data = this.allpnames;
+        cb(queryString ?data.filter(this.createStateFilter(queryString)):data);
       },
       querySearchAsyncunit(queryString, cb){
-        this.$http.get('/api/allunit').then((res)=>{
-          var data = res.data;
-          cb(queryString ?data.filter(this.createStateFilter(queryString)):data);
-        });
+        var data = this.allunits;
+        cb(queryString ?data.filter(this.createStateFilter(queryString)):data);
+      },
+      querySearchAsyncnote(queryString, cb){
+        var data = this.allnotes;
+        cb(queryString ?data.filter(this.createStateFilter(queryString)):data);
       },
       createStateFilter(queryString) {
        return (state) => {
          return (state.value.indexOf(queryString.toLowerCase()) === 0);
        };
      },
-     save(){
+     save(print){
        this.$refs['form'].validate((valid) => {
          if (valid) {
            var newitems = [];
@@ -267,8 +304,13 @@ import layout from '../components/layout.vue'
            this.order.items = newitems;
            this.fullscreenLoading = true;
             this.$http.post('/api/saveorder',this.order).then((res)=>{
-              var data = res.data;
+              if(res.data.data) {
+                this.order = res.data.data;
+              }
               this.fullscreenLoading = false;
+              if(print) {
+
+              }
               this.$message({
                message: '保存成功',
                type: 'success'
@@ -286,21 +328,17 @@ import layout from '../components/layout.vue'
               this.order = res.data.value;
             }
           });
+       } else {
+
        }
      },
      pringcick(){
-       this.$refs['form'].validate((valid) => {
-         if (valid) {
-           alert('submit!');
-         } else {
-           console.log('error submit!!');
-           return false;
-         }
-       });
+       this.save(true)
      }
     },
     mounted() {
       this.initorder();
+      this.initcname();
     }
   }
 </script>

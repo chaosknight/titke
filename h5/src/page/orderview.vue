@@ -13,16 +13,16 @@
   background-color: #ffffff;
 }
 .bord_top{
-  border-top:1px solid #dfe6ec;
+  border-top:2px solid #dfe6ec;
 }
 .bord_left{
-  border-left:1px solid #dfe6ec;
+  border-left:2px solid #dfe6ec;
 }
 .bord_right{
-  border-right:1px solid #dfe6ec;
+  border-right:2px solid #dfe6ec;
 }
 .bord_bottom{
-  border-bottom:1px solid #dfe6ec;
+  border-bottom:2px solid #dfe6ec;
 }
 
 .col_height{
@@ -56,9 +56,9 @@
 </style>
 <template>
   <div style="width:240mm;margin:0 auto;color: #1f2d3d;" class="print_c page">
-    <div v-for="item in tables" class="" style="height:140mm;padding:10mm 20mm;">
+    <div v-for="item in tables" class="bord_top bord_left bord_right bord_bottom" style="height:140mm;padding:10mm 20mm;">
       <el-row >
-        <el-col :span="24"><div style="text-align:center;line-height:6mm;font-size:4mm;">{{order.complaty}}</div></el-col>
+        <el-col :span="24"><div style="text-align:center;line-height:6mm;font-size:6mm;">{{order.complaty}}</div></el-col>
       </el-row>
       <el-row  class="col_height align_left" style="margin:4mm auto;">
         <el-col :span="8">购货单位：{{order.school}}</el-col>
@@ -367,6 +367,19 @@ export default {
     };
   },
   methods: {
+    accMul (arg1,arg2){
+      var m=0,s1=arg1.toString(),s2=arg2.toString();
+      try{m+=s1.split(".")[1].length}catch(e){}
+      try{m+=s2.split(".")[1].length}catch(e){}
+      return Number(s1.replace(".",""))*Number(s2.replace(".",""))/Math.pow(10,m)
+    },
+    accAdd(arg1,arg2){
+        var r1,r2,m;
+        try{r1=arg1.toString().split(".")[1].length}catch(e){r1=0}
+        try{r2=arg2.toString().split(".")[1].length}catch(e){r2=0}
+        m=Math.pow(10,Math.max(r1,r2))
+        return (arg1*m+arg2*m)/m
+    },
     initorder(){
       if(this.$route.params.id) {
          this.$http.get('/api/getorder/' + this.$route.params.id).then((res)=>{
@@ -385,7 +398,7 @@ export default {
           var pr = this.getitemvalue(item,i,"price");
           var num = this.getitemvalue(item,i,"number");
           if(pr && num ) {
-            return pr * num;
+            return this.accMul(pr , num);
           }
           return ''
         }
@@ -397,7 +410,7 @@ export default {
     getotal(item) {
       var sum = 0;
       for(var i=0;i<item.length;i++) {
-        sum += item[i]['price'] * item[i]['number']
+        sum = this.accAdd(sum ,this.accMul(item[i]['price'] , item[i]['number']))
       }
       return sum;
     },

@@ -4,10 +4,15 @@
     <el-row class="container">
       <el-col :span="4" class="menu">
         <el-menu   style="height:100%;"  :router="true" :default-active="active">
-          <el-submenu index="orer">
+          <el-submenu index="1">
             <template slot="title"><i class="el-icon-message"></i>订单</template>
               <el-menu-item index="/order_new">新建</el-menu-item>
               <el-menu-item index="/order_list">查询</el-menu-item>
+          </el-submenu>
+          <el-submenu index="2">
+            <template slot="title"><i class="el-icon-setting"></i>设置</template>
+              <el-menu-item index="/setting_default">默认信息</el-menu-item>
+              <el-menu-item index="/setting_sug">提示管理</el-menu-item>
           </el-submenu>
         </el-menu>
       </el-col>

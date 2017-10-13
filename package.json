@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "rimraf ./outApp && electron-packager . --platform=win32 --arch=all --out ./outApp --ignore=\"(.git|h5|.gitignore|README.md|outApp)\"",
+    "build": "electron-packager . --platform=win32 --arch=all --out ./outApp --ignore=\"(.git|h5|.gitignore|README.md|outApp)\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "chaos",
