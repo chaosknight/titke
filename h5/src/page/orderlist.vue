@@ -23,7 +23,7 @@
       </el-form-item>
     </el-form-item>
     <el-form-item label="备注">
-      <el-select v-model="formInline.note" placeholder="备注" allow-create clearable>
+      <el-select v-model="formInline.note" placeholder="备注" allow-create clearable multiple >
         <el-option
         v-for="item in allnotes"
         :key="item.value"
@@ -42,6 +42,8 @@
     <el-table
       v-loading.fullscreen.lock="loading"
       :data="orderlist"
+      :summary-method="getSummaries2"
+      show-summary
       style="width: 100%">
       <el-table-column type="expand">
         <template scope="props">
@@ -95,6 +97,9 @@
       <el-table-column
         prop="total"
         label="总金额">
+        <template scope="scope">
+          {{gettotal(scope.row.items)}}
+        </template>
       </el-table-column>
       <el-table-column
         prop="note"
@@ -171,7 +176,7 @@ import {formatDate} from '../date.js';
           schoolname: '',
           startdate: '',
           enddate:'',
-          note:''
+          note:[]
         }
       }
     },
@@ -203,10 +208,11 @@ import {formatDate} from '../date.js';
 
         list.sort(function(a,b){
             return sortfuc(a,b,['name','unit','price'])});
+            // return list;
         var result = [];
 
         for(var j=0;j<list.length;j++) {
-          var fitem = list[j]
+          var fitem = JSON.parse(JSON.stringify(list[j]))
           if(result.length == 0) {
             result.push(fitem)
           } else {
@@ -321,6 +327,50 @@ import {formatDate} from '../date.js';
 
         //this.$router.push("/order_view/" + this.orderlist[index]._id);
       },
+
+      gettotal(data) {
+        var titol = 0;
+        data.forEach((obj)=>{
+          titol = this.accAdd(titol , this.accMul(obj.number , obj.price))
+        });
+        return titol;
+      },
+      getSummaries2(param) {
+        const { columns, data } = param;
+        console.log(data)
+        const sums = [];
+        columns.forEach((column, index) => {
+          if (index === 0) {
+            sums[index] = '';
+            return;
+          }
+          if(index == 1) {
+            sums[index] = '合计';
+            return;
+          }
+          if(index < 3) {
+
+
+
+            sums[index] = 'N/A';
+            return;
+          }
+
+          if(index == 3) {
+
+            var total = 0;
+            for(var i=0;i<data.length;i++) {
+              total = this.accAdd(total , this.gettotal(data[i].items))
+            }
+
+            sums[index] = ''  + total + ' 元';
+          } else {
+            sums[index] = '';
+          }
+        });
+
+        return sums;
+      },
       getSummaries(param) {
         const { columns, data } = param;
         const sums = [];
@@ -335,11 +385,7 @@ import {formatDate} from '../date.js';
           }
 
           if(index == 4) {
-            var titol = 0;
-            data.forEach((obj)=>{
-              titol = this.accAdd(titol , this.accMul(obj.number , obj.price))
-            });
-            sums[index] = '' + titol + ' 元';
+            sums[index] = '' + this.gettotal(data) + ' 元';
           } else {
             sums[index] = '';
           }

@@ -3,6 +3,7 @@
     <el-row >
       <el-button-group class="butns">
       <el-button type="primary" icon="plus" @click="addcol">添加商品</el-button>
+      <el-button type="primary" icon="document" @click="pringcick">打印</el-button>
       <el-button type="primary" icon="upload" @click="save(false)">保存</el-button>
     </el-button-group>
   </el-row>
@@ -237,6 +238,19 @@ import { mapGetters } from 'vuex';
 
         return sums;
       },
+      handleview(){
+        var frameId = "print_fid"
+        var usedFrame = document.getElementById(frameId)
+        if (usedFrame) {
+          usedFrame.parentNode.removeChild(usedFrame)
+        }
+
+        var printFrame = document.createElement('iframe')
+        printFrame.setAttribute('style', 'visibility: hidden;')
+        printFrame.id = frameId;
+        document.body.appendChild(printFrame);
+        printFrame.src = "/#/order_view/" + this.order._id;
+      },
       addcol(){
         this.order.items.push({
             name:'',
@@ -307,9 +321,6 @@ import { mapGetters } from 'vuex';
                 this.order = res.data.data;
               }
               this.fullscreenLoading = false;
-
-              this.$store.dispatch('loadsetting');
-
               if(print) {
                 this.handleview();
               }
@@ -317,7 +328,6 @@ import { mapGetters } from 'vuex';
                message: '保存成功',
                type: 'success'
              });
-               this.$router.push('/order_edit/' + this.order._id)
             });
          } else {
            return false;
@@ -325,11 +335,15 @@ import { mapGetters } from 'vuex';
        });
      },
      initorder(){
+       if(this.$route.params.id) {
           this.$http.get('/api/getorder/' + this.$route.params.id).then((res)=>{
             if(res.data.value) {
               this.order = res.data.value;
             }
           });
+       } else {
+
+       }
      },
      pringcick(){
        this.save(true)

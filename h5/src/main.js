@@ -7,8 +7,8 @@ import axios from 'axios'
 import Vuex from 'vuex';
 Vue.use(ElementUI)
 Vue.use(Vuex)
-//axios.defaults.baseURL = window.location.protocol + '//' +window.location.hostname+":3000";
-axios.defaults.baseURL = "http://localhost:3000";
+axios.defaults.baseURL = window.location.protocol + '//' +window.location.hostname+":3000";
+//axios.defaults.baseURL = "http://localhost:3000";
 Vue.prototype.$http = axios;
 import stores from './store'
 const store = new Vuex.Store(stores)

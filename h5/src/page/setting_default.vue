@@ -35,7 +35,7 @@
 <script>
 import layout from '../components/layout.vue'
 import {formatDate} from '../date.js';
-import { mapGetters } from 'vuex';
+import { mapGetters,mapActions } from 'vuex';
 import { Loading } from 'element-ui';
   export default {
     components: { layout },
@@ -49,6 +49,8 @@ import { Loading } from 'element-ui';
       }
     },
     mounted(){
+      this.initcname();
+      this.initdunit();
     },
     watch:{
       complayname:"initcname",
@@ -66,6 +68,7 @@ import { Loading } from 'element-ui';
       })
     },
     methods: {
+      ...mapActions(['setcomplayname', 'setdunit']),
       initcname(){
           this.formInline.d_complatyname = this.complayname
       },
@@ -78,6 +81,8 @@ import { Loading } from 'element-ui';
             var loadingInstance1 = Loading.service({ fullscreen: true });
             this.$http.post('/api/savesetting',this.formInline).then((res)=>{
               loadingInstance1.close()
+              this.setcomplayname(this.formInline.d_complatyname);
+              this.setdunit(this.formInline.d_unit);
               this.$message({
                 type: 'success',
                 message: '保存成功!'
