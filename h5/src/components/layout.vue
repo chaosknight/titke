@@ -1,8 +1,8 @@
 <template>
   <div class="wrapper">
-    <header></header>
+    <header class="no-print"></header>
     <el-row class="container">
-      <el-col :span="4" class="menu">
+      <el-col :span="4" class="menu no-print">
         <el-menu   style="height:100%;"  :router="true" :default-active="active">
           <el-submenu index="1">
             <template slot="title"><i class="el-icon-message"></i>订单</template>

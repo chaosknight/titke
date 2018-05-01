@@ -41,8 +41,6 @@
 @page {
   size:A4;
   margin: 0;
-
-
 }
 @media print {
   html, body {

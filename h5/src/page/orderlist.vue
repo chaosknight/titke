@@ -1,7 +1,7 @@
 <template>
-  <layout active="/order_list">
+  <layout active="/order_list" class="page">
 
-  <el-form :inline="false" :model="formInline" label-width="80px" class="demo-form-inline">
+  <el-form :inline="false" :model="formInline" label-width="80px" class="demo-form-inline no-print">
     <el-form-item label="购货单位">
       <el-select v-model="formInline.schoolname" placeholder="请选择购货单位" allow-create clearable>
         <el-option
@@ -37,8 +37,8 @@
     </el-form-item>
   </el-form>
 
-  <el-tabs type="border-card">
-  <el-tab-pane label="订单视图">
+  <el-tabs type="border-card" class="no-print">
+  <el-tab-pane label="订单视图" >
     <el-table
       v-loading.fullscreen.lock="loading"
       :data="orderlist"
@@ -116,6 +116,7 @@
     </el-table>
   </el-tab-pane>
   <el-tab-pane label="汇总视图">
+    <el-button type="primary" @click="onprint" style="margin-bottom:20px;">打印汇总</el-button>
     <el-table
     border
     :summary-method="getSummaries"
@@ -152,6 +153,43 @@
     </el-table>
   </el-tab-pane>
 </el-tabs>
+<el-table
+border
+:summary-method="getSummaries"
+style="width: 100%"
+class="only-for-print"
+show-summary
+fit="true"
+:data="huizonglist"
+>
+<el-table-column
+  prop="name"
+  label="商品名称">
+</el-table-column>
+<el-table-column
+  prop="unit"
+  label="单位">
+</el-table-column>
+<el-table-column
+  prop="price"
+  label="单价">
+</el-table-column>
+<el-table-column
+  prop="number"
+  label="数量">
+</el-table-column>
+<el-table-column
+  prop="number"
+  label="金额">
+  <template scope="scope">
+    {{accMul(scope.row.price , scope.row.number)}}
+  </template>
+</el-table-column>
+<el-table-column
+  prop="note"
+  label="备注">
+</el-table-column>
+</el-table>
 </layout>
 </template>
 <script>
@@ -393,6 +431,35 @@ import {formatDate} from '../date.js';
 
         return sums;
       },
+      onprint() {
+        window.print();
+      }
     }
   }
 </script>
+<style>
+ @media screen{
+  .only-for-print{
+    display:none;
+  }
+ }
+ @media print{
+ .no-print{
+ display:none;
+ }
+ .only-for-print{
+  display:block;
+ }
+
+ html, body {
+   font-size: 4mm;
+   width: 460mm;
+   margin:0 auto;
+ }
+ }
+
+ @page {
+   size:A4;
+   margin: 0;
+ }
+</style>
